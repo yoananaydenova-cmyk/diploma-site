@@ -1,9 +1,7 @@
-// src/pages/About.jsx
-import React from "react";
 import { Button, Card } from "flowbite-react";
 
 export default function About() {
-  const cvLink = "/CV_Yoana.pdf"; // сложи своя PDF файл тук
+  const cvLink = "/CV.pdf"; // сложи своя PDF файл тук
   const profileImage = "https://images.freeimages.com/images/premium/previews/2648/26481754-businesswoman.jpg?fmt=webp&h=350"; // сложи своята снимка
 
   return (
