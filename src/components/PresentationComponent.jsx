@@ -9,7 +9,7 @@ export default function PresentationComponent() {
 
   const docs = [
     {
-      uri: "/presentation.pdf",
+      uri: `${import.meta.env.BASE_URL}presentation.pdf`,
       fileType: "pdf",
       fileName: "presentation.pdf",
     },

@@ -9,7 +9,7 @@ export default function DiplomaComponent() {
 
   const docs = [
     {
-      uri: "/diploma.pdf",
+      uri: `${import.meta.env.BASE_URL}diploma.pdf`,
       fileType: "pdf",
       fileName: "diploma.pdf",
     },
