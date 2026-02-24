@@ -3,9 +3,10 @@ import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 
 export default function PresentationComponent() {
   const [showViewer, setShowViewer] = useState(false);
-  const [containerHeight, setContainerHeight] = useState(600);
+  const [containerHeight, setContainerHeight] = useState(700);
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef(null);
+  const sectionRef = useRef(null);
 
   const docs = [
     {
@@ -15,15 +16,14 @@ export default function PresentationComponent() {
     },
   ];
 
-  // Автоматично задаване на височина и детекция на мобилни
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setIsMobile(true);
-        setContainerHeight(window.innerHeight * 0.7);
+        setContainerHeight(window.innerHeight * 0.8);
       } else {
         setIsMobile(false);
-        setContainerHeight(600);
+        setContainerHeight(750);
       }
     };
 
@@ -32,58 +32,58 @@ export default function PresentationComponent() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fit-to-width zoom за мобилни
+  useEffect(() => {
+    if (showViewer && sectionRef.current) {
+      setTimeout(() => {
+        sectionRef.current.scrollIntoView({ behavior: "smooth" });
+      }, 200);
+    }
+  }, [showViewer]);
+
   const getZoom = () => {
-    if (!isMobile || !containerRef.current) return 1.0;
-    const containerWidth = containerRef.current.offsetWidth;
-    return containerWidth / 800; // 800px е предполагаемата ширина на PDF страницата
+    if (!isMobile || !containerRef.current) return 1;
+    return containerRef.current.offsetWidth / 800;
   };
 
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4 text-center">ПРЕЗЕНТАЦИЯ</h2>
+    <div ref={sectionRef} className="text-center">
+      <div className="flex flex-wrap justify-center gap-5 mb-8">
+        <button
+          onClick={() => setShowViewer((prev) => !prev)}
+          className={`px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 ${
+            showViewer
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : "bg-indigo-600 text-white hover:bg-indigo-700"
+          }`}
+        >
+          {showViewer ? "✖ Затвори презентацията" : "👁 Прегледай презентацията"}
+        </button>
 
-      <div className="max-w-6xl mx-auto bg-white shadow-xl rounded-xl p-4 text-center">
-        {/* Бутоните винаги видими */}
-        <div className="flex justify-center gap-4 mb-4">
-          <button
-            onClick={() => setShowViewer((prev) => !prev)}
-            className={`px-6 py-3 font-medium rounded ${
-              showViewer
-                ? "bg-red-500 text-white hover:bg-red-600"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            {showViewer ? "✖ Затвори презентацията" : "👁 Виж презентация"}
-          </button>
+        <a
+          href={docs[0].uri}
+          download
+          className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-semibold text-lg shadow-lg hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105"
+        >
+          ⬇ Изтегли PDF
+        </a>
+      </div>
 
-          <a
-            href={docs[0].uri}
-            download={docs[0].fileName}
-            className="px-6 py-3 bg-green-600 text-white font-medium rounded hover:bg-green-700"
-          >
-            ⬇ Изтегли презентацията
-          </a>
-        </div>
-
+      <div
+        className={`transition-all duration-500 ease-in-out ${
+          showViewer
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-5 pointer-events-none h-0 overflow-hidden"
+        }`}
+      >
         {showViewer && (
           <div
             ref={containerRef}
-            className="overflow-y-scroll rounded-lg border"
+            className="rounded-3xl border border-gray-300 overflow-y-auto shadow-2xl bg-white"
             style={{ height: containerHeight }}
           >
             <DocViewer
               documents={docs}
               pluginRenderers={DocViewerRenderers}
-              theme={{
-                primary: "#5296d8",
-                secondary: "#ffffff",
-                tertiary: "#5296d899",
-                textPrimary: "#ffffff",
-                textSecondary: "#5296d8",
-                textTertiary: "#00000099",
-                disableThemeScrollbar: false,
-              }}
               config={{
                 pdfVerticalScrollByDefault: isMobile,
                 pdfZoom: { defaultZoom: getZoom() },
@@ -93,6 +93,6 @@ export default function PresentationComponent() {
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }
