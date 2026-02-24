@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import "@cyntler/react-doc-viewer/dist/index.css";
 
 export default function DiplomaComponent() {
   const [showViewer, setShowViewer] = useState(false);
