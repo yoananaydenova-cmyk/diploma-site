@@ -1,98 +1,35 @@
-import { useState, useEffect, useRef } from "react";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import { useState } from "react";
+import PDFModal from "./PDFModal";
 
 export default function PresentationComponent() {
-  const [showViewer, setShowViewer] = useState(false);
-  const [containerHeight, setContainerHeight] = useState(700);
-  const [isMobile, setIsMobile] = useState(false);
-  const containerRef = useRef(null);
-  const sectionRef = useRef(null);
-
-  const docs = [
-    {
-      uri: `${import.meta.env.BASE_URL}presentation.pdf`,
-      fileType: "pdf",
-      fileName: "presentation.pdf",
-    },
-  ];
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsMobile(true);
-        setContainerHeight(window.innerHeight * 0.8);
-      } else {
-        setIsMobile(false);
-        setContainerHeight(750);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (showViewer && sectionRef.current) {
-      setTimeout(() => {
-        sectionRef.current.scrollIntoView({ behavior: "smooth" });
-      }, 200);
-    }
-  }, [showViewer]);
-
-  const getZoom = () => {
-    if (!isMobile || !containerRef.current) return 1;
-    return containerRef.current.offsetWidth / 800;
-  };
+  const [open, setOpen] = useState(false);
+  const file = `${import.meta.env.BASE_URL}presentation.pdf`;
 
   return (
-    <div ref={sectionRef} className="text-center">
-      <div className="flex flex-wrap justify-center gap-5 mb-8">
+    <>
+      <div className="flex flex-wrap justify-center gap-5">
         <button
-          onClick={() => setShowViewer((prev) => !prev)}
-          className={`px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 ${
-            showViewer
-              ? "bg-red-600 text-white hover:bg-red-700"
-              : "bg-indigo-600 text-white hover:bg-indigo-700"
-          }`}
+          onClick={() => setOpen(true)}
+          className="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105"
         >
-          {showViewer ? "✖ Затвори презентацията" : "👁 Прегледай презентацията"}
+          👁 Прегледай презентацията
         </button>
 
         <a
-          href={docs[0].uri}
+          href={file}
           download
-          className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-semibold text-lg shadow-lg hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105"
+          className="px-8 py-4 bg-emerald-600 text-white rounded-xl font-semibold shadow-lg hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105"
         >
           ⬇ Изтегли PDF
         </a>
       </div>
 
-      <div
-        className={`transition-all duration-500 ease-in-out ${
-          showViewer
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-5 pointer-events-none h-0 overflow-hidden"
-        }`}
-      >
-        {showViewer && (
-          <div
-            ref={containerRef}
-            className="rounded-3xl border border-gray-300 overflow-y-auto shadow-2xl bg-white"
-            style={{ height: containerHeight }}
-          >
-            <DocViewer
-              documents={docs}
-              pluginRenderers={DocViewerRenderers}
-              config={{
-                pdfVerticalScrollByDefault: isMobile,
-                pdfZoom: { defaultZoom: getZoom() },
-                header: { disableHeader: false },
-              }}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+      <PDFModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        title="Презентация"
+        file={file}
+      />
+    </>
   );
 }
